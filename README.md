@@ -35,9 +35,7 @@ By modeling the interplay between absorption and scattering, the theory predicts
 
 **Spectral.js** uses the "simplified" or **single-constant Kubelka-Munk theory**, where the **scattering coefficient (S)** is assumed to be constant. This assumption allows the **Kubelka-Munk function \( F(R) \)** to directly relate reflectance to absorption:
 
-\[
 $$F(R) = \frac{(1 - R)^2}{2R} = \frac{K}{S}$$
-\]
 
 This relationship enables easy estimation of relative absorption from reflectance data, particularly useful in color matching and pigment formulation.
 
@@ -50,9 +48,7 @@ The resulting spectral reflectance curve is then used to calculate the Kubelka-M
 
 What sets **Spectral.js** apart is its spectral mixing model, which simulates how real pigments combine based on light absorption and scattering — rather than relying on RGB math. When colors are mixed, it calculates an **effective concentration** for each pigment using the formula:
 
-\[
-C = f^2 \cdot T^2 \cdot L
-\]
+$$C = f^2 \cdot T^2 \cdot L$$
 
 Where:
 - \( L \): luminance  
@@ -63,9 +59,7 @@ This formula integrates **luminance** (\(L\)), **tinting strength** (\(T\)), and
 
 Then the **inverse Kubelka-Munk function** is used which takes **\( K/S_{mix} \)** divided by the total concentration and returns the **reflectance \( R \)**:
 
-\[
-R = 1 + \left(\frac{K}{S}_{mix}\right) - \sqrt{\left(\frac{K}{S}_{mix}\right)^2 + 2 \cdot \left(\frac{K}{S}_{mix}\right)}
-\]
+$$R = 1 + \left(\frac{K}{S}_{mix}\right) - \sqrt{\left(\frac{K}{S}_{mix}\right)^2 + 2 \cdot \left(\frac{K}{S}_{mix}\right)}$$
 
 Using the **CIE 1931 Color Matching Functions** weighted with the **D65 Standard Illuminant** the **reflectance \( R \)** is then converted to **CIE XYZ**. 
 
@@ -166,7 +160,7 @@ console.log(gradient.toString()); //#C7938C
 ### Tinting Strength
 
 Sometimes a **Color** is too dominant and this can be countered by adjusting the **tinting strength**.
-To my knowledge there is no way to programmatically determine if a **Color** is too dominant as this is a pure perceptual phenomenon.
+To my knowledge there is no way to programmatically determine if a **Color** is too dominant as this is pure perceptual.
 
 ```js
 let color1 = new spectral.Color('#ff0000');
