@@ -36,7 +36,7 @@ By modeling the interplay between absorption and scattering, the theory predicts
 **Spectral.js** uses the "simplified" or **single-constant Kubelka-Munk theory**, where the **scattering coefficient (S)** is assumed to be constant. This assumption allows the **Kubelka-Munk function \( F(R) \)** to directly relate reflectance to absorption:
 
 \[
-F(R) = \frac{(1 - R)^2}{2R} = \frac{K}{S}
+$$F(R) = \frac{(1 - R)^2}{2R} = \frac{K}{S}$$
 \]
 
 This relationship enables easy estimation of relative absorption from reflectance data, particularly useful in color matching and pigment formulation.
