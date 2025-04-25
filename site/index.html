@@ -1,0 +1,823 @@
+<!-- MIT License
+
+  Copyright (c) 2025 Ronald van Wijnen
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+//
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+//
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE. -->
+
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Spectral.js</title>
+  <meta charset="utf-8">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
+  <link href="css/vs-code-dark.css" rel="stylesheet">
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <!-- https://github.com/Tezumie/codedye/tree/main -->
+  <script src="js/codedye.all.umd.js"></script>
+  <script src="js/spectral.min.js"></script>
+  <style>
+    body {
+      padding: 0;
+      margin: 0;
+      font-family: Arial;
+      color: #aaa;
+      font-size: 14px;
+      background: #191326;
+    }
+
+    .mix_container {
+      width: 100%;
+      margin-bottom: 20px;
+      font-size: 9px;
+    }
+
+    .chart_container {
+      width: 500px;
+      height: 400px;
+      margin-bottom: 20px;
+    }
+
+    .mix_part_bar {
+      cursor: pointer;
+    }
+
+    .mix_part_palette {
+      cursor: pointer;
+    }
+
+    .mix_part_gradient {
+      cursor: pointer;
+    }
+
+    .mix_part_multi {
+      width: 11%;
+      aspect-ratio: 1;
+      clip-path: polygon(-50% 50%, 50% 100%, 150% 50%, 50% 0);
+      cursor: pointer;
+    }
+
+    .picker {
+      margin-bottom: 10px;
+      width: 30px;
+      cursor: pointer;
+    }
+
+    .handwriting-h1 {
+      font-family: "Dancing Script", cursive;
+      font-optical-sizing: auto;
+      font-weight: 600;
+      font-style: normal;
+      font-size: 36px;
+    }
+
+    .handwriting-h2 {
+      font-family: "Dancing Script", cursive;
+      font-optical-sizing: auto;
+      font-weight: 600;
+      font-style: normal;
+      font-size: 24px;
+    }
+
+    .handwriting-h3 {
+      font-family: "Dancing Script", cursive;
+      font-optical-sizing: auto;
+      font-weight: 600;
+      font-style: normal;
+      font-size: 18px;
+    }
+
+    .handwriting-sm {
+      font-family: "Dancing Script", cursive;
+      font-optical-sizing: auto;
+      font-weight: 600;
+      font-style: normal;
+      font-size: 12px;
+    }
+
+    pre {
+      background: #221A35;
+    }
+
+    /* inspired by the SynthWave theme: https://github.com/robb0wen/synthwave-vscode */
+    .functionName,
+    .type\.identifier {
+      color: #fdfdfd;
+      text-shadow: 0 0 2px #001716, 0 0 3px #03edf9, 0 0 5px #03edf9, 0 0 8px #03edf9, 0 0 12px #03edf9;
+      backface-visibility: hidden;
+    }
+
+    .keyword\.declaration {
+      color: #f4eee4;
+      text-shadow: 0 0 2px #393a33, 0 0 8px #f39f05, 0 0 2px #f39f05;
+      backface-visibility: hidden;
+    }
+
+
+    .identifier,
+    .objectName {
+      color: #f92aad;
+      text-shadow: 0 0 2px #100c0f, 0 0 5px #dc078e33, 0 0 10px #fff3;
+      backface-visibility: hidden;
+    }
+  </style>
+</head>
+
+<body>
+  <main style="padding-bottom: 20px; display: flex; justify-content: center;">
+    <div style="padding: 0 25px;">
+      <div style="display: flex; justify-content: start; padding-top: 25px;">
+        <div style="width: 150px; padding-right: 25px; top: 0; align-self: flex-start;">
+          <a href="index.html">
+            <img src="images/logo.png" alt="" width="100px" height="100px" style="margin-right: 25px;">
+          </a>
+        </div>
+        <div style="display: flex; justify-content: start; flex-wrap: wrap;">
+          <div style="width: 500px;">
+            <p style="padding-top: 20px; padding-right: 25px;">
+              <strong>Spectral.js</strong> is a lightweight JavaScript library for <strong>realistic pigment
+                mixing</strong>, using the
+              <a href="https://en.wikipedia.org/wiki/Kubelka%E2%80%93Munk_theory" style="color: #bbb;" target="_blank">Kubelka-Munk
+                theory</a>
+              to simulate how real paints absorb and scatter light.
+            </p>
+          </div>
+          <div style="width: 500px;">
+            <p style="padding-top: 20px;">
+              Unlike typical RGB blending, Spectral.js calculates pigment interactions through spectral reflectance and
+              colorimetric math — including <strong>OKLab</strong>, <strong>OKLCh</strong>, and ΔE gamut mapping — for
+              accurate,
+              perceptual mixing.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div style="display: flex; justify-content: start;">
+        <div style="width: 150px; position: sticky; top: 0; align-self: flex-start;">
+          <span class="handwriting-h2">Selected color</span>
+          <div id="output" style="margin-bottom: 15px; width: 100px; height: 100px;">
+            <div style="display: table; height: 100%; width: 100%;">
+              <div class="hex" style="display: table-cell; vertical-align: middle; width: 100%; text-align: center;">
+              </div>
+            </div>
+          </div>
+          <span class="handwriting-h2">Color 1</span>
+          <br>
+          <input type="color" id="color1" class="picker">
+          <button onclick="random('1')" style="position: relative; top: -7px;">Random</button>
+          <div>
+            <label for="color1_tinting_strength" class="handwriting-h3">Tinting
+              Strength</label>
+            <input type="range" id="color1_tinting_strength" class="tinting_strength" style="width: 90px;" min="0.1" max="2" value="1" step="0.05" />
+            <span id="color1_tinting_value" class="handwriting-sm" style="position: relative; top: -4px;">1.00</span>
+          </div>
+          <br>
+          <span class="handwriting-h2">Color 2</span>
+          <br>
+          <input type="color" id="color2" class="picker">
+          <button onclick="random('2')" style="position: relative; top: -7px;">Random</button>
+          <div>
+            <label for="color2_tinting_strength" class="handwriting-h3">Tinting
+              Strength</label>
+            <input type="range" id="color2_tinting_strength" class="tinting_strength" style="width: 90px;" min="0.1" max="2" value="1" step="0.05" />
+            <span id="color2_tinting_value" class="handwriting-sm" style="position: relative; top: -4px;">1.00</span>
+          </div>
+          <br>
+          <span class="handwriting-h2">Color 3</span>
+          <br>
+          <input type="color" id="color3" class="picker">
+          <button onclick="random('3')" style="position: relative; top: -7px;">Random</button>
+          <div>
+            <label for="color3_tinting_strength" class="handwriting-h3">Tinting
+              Strength</label>
+            <input type="range" id="color3_tinting_strength" class="tinting_strength" style="width: 90px;" min="0.1" max="2" value="1" step="0.05" />
+            <span id="color3_tinting_value" class="handwriting-sm" style="position: relative; top: -4px;">1.00</span>
+          </div>
+          <br>
+          <button onclick="random()" style="margin-bottom: 10px;">Randomize all</button>
+          <br>
+          <label for="color_preset" class="handwriting-h2">Preset</label>
+          <br>
+          <select id="color_preset" style="margin-bottom: 10px; width: 50px;">
+            <option value="1" selected>1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+            <option value="11">11</option>
+            <option value="12">12</option>
+          </select>
+          <br>
+          <label for="gamutmethod" class="handwriting-h2">Gamutmapping</label>
+          <select id="gamutmethod" style="margin-bottom: 10px; width: 75px;">
+            <option value="none">None</option>
+            <option value="clip" selected>Clip</option>
+            <option value="map">Map</option>
+          </select>
+        </div>
+        <div style="display: flex; flex-wrap: wrap;">
+          <div style="width: 500px;">
+            <div>
+              <span class="handwriting-h1" style="display: flex; justify-content: center;">Mixing</span>
+              <div id="mix_container_bar" class="mix_container"></div>
+              <pre style="margin: 0 15px;"><code id="mix_container_bar_code"></code></pre>
+              <span class="handwriting-h1" style="display: flex; justify-content: center;">Palette</span>
+              <div id="mix_container_palette" class="mix_container" style="display: flex; justify-content: center;"></div>
+              <pre style="margin: 0 15px;"><code id="mix_container_palette_code"></code></pre>
+              <span class="handwriting-h1" style="display: flex; justify-content: center;">Gradient</span>
+              <div id="mix_container_gradient" class="mix_container"></div>
+              <pre style="margin: 0 15px;"><code id="mix_container_gradient_code"></code></pre>
+            </div>
+          </div>
+          <div style="width: 500px;">
+            <span class="handwriting-h1" style="display: flex; justify-content: center;">Multi-color mixing</span>
+            <div id="mix_container_multi" class="mix_container" style="height: 380px;"></div>
+            <pre style="margin: 0 15px;"><code id="mix_container_multi_code"></code></pre>
+            <span class="handwriting-h2" style="display: flex; justify-content: center; margin-top: 20px;">Available on GitHub</span>
+            <a href="https://github.com/rvanwijnen/spectral.js" target="_blank" style="display: flex; justify-content: center;">
+              <img src="images/github-mark.png" width="50px" height="50px">
+            </a>
+          </div>
+        </div>
+      </div>
+  </main>
+  <script type="text/javascript">
+    let mixCount = 8;
+    let barCount = 160;
+
+    document.addEventListener('DOMContentLoaded', function () {
+      //starting values
+      document.querySelector("#color1").value = "#FCF046";
+      document.querySelector("#color2").value = "#E53166";
+      document.querySelector("#color3").value = "#3375DA";
+
+      updateSelectedColor(new spectral.Color(document.querySelector("#color1").value));
+      //starting values
+
+      setupBar();
+      setupPalette();
+      setupGradient();
+      setupMulti();
+
+      document.querySelectorAll(".picker").forEach(d => {
+        d.addEventListener("input", function (e) {
+          updateSelectedColor(new spectral.Color(document.querySelector("#color1").value));
+
+          updateBar();
+          updatePalette();
+          updateGradient();
+          updateMulti();
+        });
+      });
+
+      document.querySelectorAll(".tinting_strength").forEach(d => {
+        d.addEventListener("input", function (e) {
+          document.querySelector("#color1_tinting_value").textContent = parseFloat(document.querySelector("#color1_tinting_strength").value).toFixed(2);
+          document.querySelector("#color2_tinting_value").textContent = parseFloat(document.querySelector("#color2_tinting_strength").value).toFixed(2);
+          document.querySelector("#color3_tinting_value").textContent = parseFloat(document.querySelector("#color3_tinting_strength").value).toFixed(2);
+
+          updateBar();
+          updatePalette();
+          updateGradient();
+          updateMulti();
+        });
+      });
+
+      document.querySelector("#gamutmethod").addEventListener("change", function (e) {
+        updateBar();
+        updatePalette();
+        updateGradient();
+        updateMulti();
+      });
+
+      document.querySelector("#color_preset").addEventListener("change", function (e) {
+        document.querySelector("#color1_tinting_strength").value = "1";
+        document.querySelector("#color2_tinting_strength").value = "1";
+        document.querySelector("#color3_tinting_strength").value = "1";
+
+        switch (e.target.value) {
+          case '1':
+            document.querySelector("#color1").value = "#FCF046";
+            document.querySelector("#color2").value = "#E53166";
+            document.querySelector("#color3").value = "#3375DA";
+            break;
+
+          case '2':
+            document.querySelector("#color1").value = "#002185";
+            document.querySelector("#color2").value = "#fcd200";
+            document.querySelector("#color3").value = "#ffffff";
+            break;
+
+          case '3':
+            document.querySelector("#color1").value = "#0000ff";
+            document.querySelector("#color2").value = "#ff0066";
+            document.querySelector("#color3").value = "#ffffff";
+            break;
+
+          case '4':
+            document.querySelector("#color1").value = "#d27338";
+            document.querySelector("#color2").value = "#95a683";
+            document.querySelector("#color3").value = "#ffffff";
+            break;
+
+          case '5':
+            document.querySelector("#color1").value = "#ff0000";
+            document.querySelector("#color2").value = "#ffff00";
+            document.querySelector("#color3").value = "#0000ff";
+
+            document.querySelector("#color1_tinting_strength").value = "0.35";
+            break;
+
+          case '6':
+            document.querySelector("#color1").value = "#CF206B";
+            document.querySelector("#color2").value = "#061A5B";
+            document.querySelector("#color3").value = "#B9E264";
+            break;
+          case '7':
+            document.querySelector("#color1").value = "#005E72";
+            document.querySelector("#color2").value = "#EAD9A7";
+            document.querySelector("#color3").value = "#894B54";
+
+            document.querySelector("#color1_tinting_strength").value = "0.6";
+            break;
+
+          case '8':
+            document.querySelector("#color1").value = "#AD2BAC";
+            document.querySelector("#color2").value = "#703FCE";
+            document.querySelector("#color3").value = "#E1D05D";
+            break;
+
+          case '9':
+            document.querySelector("#color1").value = "#BB0657";
+            document.querySelector("#color2").value = "#E0E0B3";
+            document.querySelector("#color3").value = "#FF985A";
+
+            document.querySelector("#color1_tinting_strength").value = "0.5";
+            break;
+
+          case '10':
+            document.querySelector("#color1").value = "#5A8D7B";
+            document.querySelector("#color2").value = "#082134";
+            document.querySelector("#color3").value = "#F5EDC1";
+
+            document.querySelector("#color1_tinting_strength").value = "0.5";
+            document.querySelector("#color3_tinting_strength").value = "0.65";
+            break;
+
+          case '11':
+            document.querySelector("#color1").value = "#08EF9A";
+            document.querySelector("#color2").value = "#851C72";
+            document.querySelector("#color3").value = "#E1D05D";
+
+            document.querySelector("#color1_tinting_strength").value = "0.75";
+            break;
+
+          case '12':
+            document.querySelector("#color1").value = "#5702B3";
+            document.querySelector("#color2").value = "#B97746";
+            document.querySelector("#color3").value = "#FBFFE0";
+            break;
+        }
+
+        document.querySelector("#color1_tinting_value").textContent = parseFloat(document.querySelector("#color1_tinting_strength").value).toFixed(2);
+        document.querySelector("#color2_tinting_value").textContent = parseFloat(document.querySelector("#color2_tinting_strength").value).toFixed(2);
+        document.querySelector("#color3_tinting_value").textContent = parseFloat(document.querySelector("#color3_tinting_strength").value).toFixed(2);
+
+        updateSelectedColor(new spectral.Color(document.querySelector("#color1").value));
+
+        updateBar();
+        updatePalette();
+        updateGradient();
+        updateMulti();
+      });
+
+      updateBar();
+      updatePalette();
+      updateGradient();
+      updateMulti();
+
+    }, false);
+
+    let setupBar = () => {
+      let mix_container_bar = document.querySelector('#mix_container_bar');
+      let mix_container_bar_data = "";
+
+      mix_container_bar_data += "<div style='display: flex; justify-content: center; height: 60px; padding: 0 15px;'>";
+
+      for (let i = 0; i <= barCount; i++) {
+        let factor1 = barCount - i;
+        let factor2 = i;
+
+        mix_container_bar_data += `<span class='mix_part_bar' factor_1='${factor1}' factor_2='${factor2}' style='background: #fff; width: ${(100 / barCount)}%; ${i % (barCount / 2) === 0 ? '' : ' height: 90%; align-self: center;'}'></span>`;
+      }
+
+      mix_container_bar_data += "</div>"
+      mix_container_bar.innerHTML = mix_container_bar_data;
+
+      document.querySelectorAll("#mix_container_bar .mix_part_bar").forEach(d => {
+        d.addEventListener("click", function (e) {
+          let mixPart = e.target.closest('.mix_part_bar');
+
+          let c1 = new spectral.Color(document.querySelector("#color1").value);
+          let c2 = new spectral.Color(document.querySelector("#color2").value);
+
+          c1.tintingStrength = parseFloat(document.querySelector("#color1_tinting_strength").value);
+          c2.tintingStrength = parseFloat(document.querySelector("#color2_tinting_strength").value);
+
+          let gamutmethod = document.querySelector("#gamutmethod").value;
+
+          let factor1 = parseInt(mixPart.getAttribute("factor_1"));
+          let factor2 = parseInt(mixPart.getAttribute("factor_2"));
+
+          let mix = spectral.mix(
+            [c1, factor1],
+            [c2, factor2]
+          );
+
+          if (gamutmethod != 'none' && !mix.inGamut()) {
+            mix = mix.toGamut({ method: gamutmethod });
+          }
+
+          console.clear();
+          console.log(mix.toString());
+          console.log(mix);
+
+          updateSelectedColor(mix);
+        });
+      });
+    }
+
+    let setupPalette = () => {
+      let mix_container_palette = document.querySelector('#mix_container_palette');
+      let mix_container_palette_data = "";
+
+      mix_container_palette_data += "<div style='display: flex; justify-content: center; height: 60px; width: 100%; padding: 0 15px;'>";
+
+      for (let i = 0; i < mixCount; i++) {
+        mix_container_palette_data += `<span class='mix_part_palette${(i == 0 ? ' selected' : '')}' index='${i}' style='background: #fff; width: ${100 / mixCount}%; overflow: hidden;'></span>`;
+      }
+
+      mix_container_palette_data += "</div>"
+      mix_container_palette.innerHTML = mix_container_palette_data;
+
+      document.querySelectorAll("#mix_container_palette .mix_part_palette").forEach(d => {
+        d.addEventListener("click", function (e) {
+          let mixPart = e.target.closest('.mix_part_palette');
+
+          let c1 = new spectral.Color(document.querySelector("#color1").value);
+          let c2 = new spectral.Color(document.querySelector("#color2").value);
+
+          c1.tintingStrength = parseFloat(document.querySelector("#color1_tinting_strength").value);
+          c2.tintingStrength = parseFloat(document.querySelector("#color2_tinting_strength").value);
+
+          let gamutmethod = document.querySelector("#gamutmethod").value;
+
+          let index = parseInt(mixPart.getAttribute("index"));
+
+          let palette = spectral.palette(c1, c2, mixCount);
+
+          let c = palette[index];
+
+          if (gamutmethod != 'none' && !c.inGamut()) {
+            c = c.toGamut({ method: gamutmethod });
+          }
+
+          console.clear();
+          console.log(c.toString());
+          console.log(c);
+
+          updateSelectedColor(c);
+        });
+      });
+    }
+
+    let setupGradient = () => {
+      let mix_container_gradient = document.querySelector('#mix_container_gradient');
+      let mix_container_gradient_data = "";
+
+      mix_container_gradient_data += "<div style='display: flex; justify-content: center; height: 60px; padding: 0 15px;'>";
+
+      for (let i = 0; i <= barCount; i++) {
+        let factor = i / barCount;
+
+        mix_container_gradient_data += `<span class='mix_part_gradient' factor='${factor}' style='background: #fff; width: ${(100 / barCount)}%; ${i % (barCount / 2) === 0 ? '' : ' height: 90%; align-self: center;'}'></span>`;
+      }
+
+      mix_container_gradient_data += "</div>"
+      mix_container_gradient.innerHTML = mix_container_gradient_data;
+
+      document.querySelectorAll("#mix_container_gradient .mix_part_gradient").forEach(d => {
+        d.addEventListener("click", function (e) {
+          let mixPart = e.target.closest('.mix_part_gradient');
+
+          let c1 = new spectral.Color(document.querySelector("#color1").value);
+          let c2 = new spectral.Color(document.querySelector("#color2").value);
+          let c3 = new spectral.Color(document.querySelector("#color3").value);
+
+          c1.tintingStrength = parseFloat(document.querySelector("#color1_tinting_strength").value);
+          c2.tintingStrength = parseFloat(document.querySelector("#color2_tinting_strength").value);
+          c3.tintingStrength = parseFloat(document.querySelector("#color3_tinting_strength").value);
+
+          let gamutmethod = document.querySelector("#gamutmethod").value;
+
+          let factor = parseFloat(mixPart.getAttribute("factor"));
+
+          let gradient = spectral.gradient(
+            factor,
+            [c1, 0.0],
+            [c2, 0.5],
+            [c3, 1.0]
+          );
+
+          if (gamutmethod != 'none' && !gradient.inGamut()) {
+            gradient = gradient.toGamut({ method: gamutmethod });
+          }
+
+          console.clear();
+          console.log(gradient.toString());
+          console.log(gradient);
+
+          updateSelectedColor(gradient);
+        });
+      });
+    }
+
+    let setupMulti = () => {
+      let mix_container_multi = document.querySelector('#mix_container_multi');
+      let mix_container_multi_data = "";
+
+      for (let row = 0; row <= mixCount; row++) {
+        mix_container_multi_data += `<div style='display: flex; justify-content: center; position: relative; top: ${row * -14}px;'>`
+
+        for (let col = 0; col <= mixCount - row; col++) {
+          let factor1 = mixCount - col - row;
+          let factor2 = col;
+          let factor3 = row;
+
+          mix_container_multi_data += `<span class='mix_part_multi' factor_1='${factor1}' factor_2='${factor2}' factor_3='${factor3}' style='background: #fff;' : '')}'></span>`;
+        }
+
+        mix_container_multi_data += "</div>"
+      }
+
+      mix_container_multi.innerHTML = mix_container_multi_data;
+
+      document.querySelectorAll("#mix_container_multi .mix_part_multi").forEach(d => {
+        d.addEventListener("click", function (e) {
+          let mixPart = e.target.closest('.mix_part_multi');
+
+          let c1 = new spectral.Color(document.querySelector("#color1").value);
+          let c2 = new spectral.Color(document.querySelector("#color2").value);
+          let c3 = new spectral.Color(document.querySelector("#color3").value);
+
+          c1.tintingStrength = parseFloat(document.querySelector("#color1_tinting_strength").value);
+          c2.tintingStrength = parseFloat(document.querySelector("#color2_tinting_strength").value);
+          c3.tintingStrength = parseFloat(document.querySelector("#color3_tinting_strength").value);
+
+          let gamutmethod = document.querySelector("#gamutmethod").value;
+
+          let factor1 = parseInt(mixPart.getAttribute("factor_1"));
+          let factor2 = parseInt(mixPart.getAttribute("factor_2"));
+          let factor3 = parseInt(mixPart.getAttribute("factor_3"));
+
+          let mix = spectral.mix(
+            [c1, factor1],
+            [c2, factor2],
+            [c3, factor3]
+          );
+
+          if (gamutmethod != 'none' && !mix.inGamut()) {
+            mix = mix.toGamut({ method: gamutmethod });
+          }
+
+          console.clear();
+          console.log(mix.toString());
+          console.log(mix);
+
+          updateSelectedColor(mix);
+        });
+      });
+    }
+
+    const updateCodeBlock = (id, js) => {
+      const codeDye = CodeDye.highlightElement(js, { language: 'js' });
+
+      const regex = /<span class="string js-string">(#[0-9A-Fa-f]{6})<\/span>/g;
+
+      let match;
+      let replacedHtml = codeDye;
+
+      while ((match = regex.exec(codeDye)) !== null) {
+        let color = new spectral.Color(match[1]);
+
+        const originalSpan = match[0];
+        const newSpan = `<span class="string js-string" style="background: ${color.toString('rgb')}; color:${color.luminance < 0.25 ? '#ccc' : '#333'};">${color.toString()}</span>`;
+
+        replacedHtml = replacedHtml.replace(originalSpan, newSpan);
+      }
+
+      let code = document.querySelector(id);
+      code.innerHTML = replacedHtml.replace('<code class="language-js">', '').replace('</code>', '');
+    }
+
+    const updateSelectedColor = (color) => {
+      let output = document.querySelector("#output");
+
+      output.style.setProperty('background-color', color.toString());
+      output.style.setProperty('color', color.luminance < 0.25 ? '#ccc' : '#333');
+      output.querySelector(".hex").innerHTML = color.toString();
+    }
+
+    const updateBar = () => {
+      let c1 = new spectral.Color(document.querySelector("#color1").value);
+      let c2 = new spectral.Color(document.querySelector("#color2").value);
+
+      c1.tintingStrength = parseFloat(document.querySelector("#color1_tinting_strength").value);
+      c2.tintingStrength = parseFloat(document.querySelector("#color2_tinting_strength").value);
+
+      let gamutmethod = document.querySelector("#gamutmethod").value;
+
+      document.querySelectorAll("#mix_container_bar .mix_part_bar").forEach(d => {
+        let factor1 = parseInt(d.getAttribute("factor_1"));
+        let factor2 = parseInt(d.getAttribute("factor_2"));
+
+        let mix = spectral.mix(
+          [c1, factor1],
+          [c2, factor2]
+        );
+
+        if (gamutmethod != 'none' && !mix.inGamut()) {
+          mix = mix.toGamut({ method: gamutmethod });
+        }
+
+        d.style.setProperty('background-color', mix.toString());
+        d.style.setProperty('color', mix.luminance < 0.25 ? '#ccc' : '#333');
+      });
+
+      updateCodeBlock("#mix_container_bar_code", `let color1 = new spectral.Color("${document.querySelector("#color1").value}");
+let color2 = new spectral.Color("${document.querySelector("#color2").value}");
+
+let mix = spectral.mix([color1, ...], [color2, ...]);`);
+    }
+
+    const updatePalette = () => {
+      let c1 = new spectral.Color(document.querySelector("#color1").value);
+      let c2 = new spectral.Color(document.querySelector("#color2").value);
+
+      c1.tintingStrength = parseFloat(document.querySelector("#color1_tinting_strength").value);
+      c2.tintingStrength = parseFloat(document.querySelector("#color2_tinting_strength").value);
+
+      let gamutmethod = document.querySelector("#gamutmethod").value;
+
+      document.querySelectorAll("#mix_container_palette .mix_part_palette").forEach(d => {
+        let index = parseInt(d.getAttribute("index"));
+
+        let palette = spectral.palette(c1, c2, mixCount);
+
+        let c = palette[index];
+
+        if (gamutmethod != 'none' && !c.inGamut()) {
+          c = c.toGamut({ method: gamutmethod });
+        }
+
+        d.style.setProperty('background-color', c.toString());
+        d.style.setProperty('color', c.luminance < 0.25 ? '#ccc' : '#333');
+      });
+
+      updateCodeBlock("#mix_container_palette_code", `let color1 = new spectral.Color("${document.querySelector("#color1").value}");
+let color2 = new spectral.Color("${document.querySelector("#color2").value}");
+
+let palette = spectral.palette(color1, color2, size)[...];`);
+    }
+
+    const updateGradient = () => {
+      let c1 = new spectral.Color(document.querySelector("#color1").value);
+      let c2 = new spectral.Color(document.querySelector("#color2").value);
+      let c3 = new spectral.Color(document.querySelector("#color3").value);
+
+      c1.tintingStrength = parseFloat(document.querySelector("#color1_tinting_strength").value);
+      c2.tintingStrength = parseFloat(document.querySelector("#color2_tinting_strength").value);
+      c3.tintingStrength = parseFloat(document.querySelector("#color3_tinting_strength").value);
+
+      let gamutmethod = document.querySelector("#gamutmethod").value;
+
+      document.querySelectorAll("#mix_container_gradient .mix_part_gradient").forEach(d => {
+        let factor = parseFloat(d.getAttribute("factor"));
+
+        let gradient = spectral.gradient(
+          factor,
+          [c1, 0.0],
+          [c2, 0.5],
+          [c3, 1.0]
+        );
+
+        if (gamutmethod != 'none' && !gradient.inGamut()) {
+          gradient = gradient.toGamut({ method: gamutmethod });
+        }
+
+        d.style.setProperty('background-color', gradient.toString());
+        d.style.setProperty('color', gradient.luminance < 0.25 ? '#ccc' : '#333');
+      });
+
+      updateCodeBlock("#mix_container_gradient_code", `let color1 = new spectral.Color("${document.querySelector("#color1").value}");
+let color2 = new spectral.Color("${document.querySelector("#color2").value}");
+let color3 = new spectral.Color("${document.querySelector("#color3").value}");
+
+let gradient = spectral.gradient(
+     ..., [color1, 0.0], [color2, 0.5], [color3, 1.0]
+);`);
+    }
+
+    let updateMulti = () => {
+      let c1 = new spectral.Color(document.querySelector("#color1").value);
+      let c2 = new spectral.Color(document.querySelector("#color2").value);
+      let c3 = new spectral.Color(document.querySelector("#color3").value);
+
+      c1.tintingStrength = parseFloat(document.querySelector("#color1_tinting_strength").value);
+      c2.tintingStrength = parseFloat(document.querySelector("#color2_tinting_strength").value);
+      c3.tintingStrength = parseFloat(document.querySelector("#color3_tinting_strength").value);
+
+      let gamutmethod = document.querySelector("#gamutmethod").value;
+
+      document.querySelectorAll("#mix_container_multi .mix_part_multi").forEach(d => {
+        let factor1 = parseInt(d.getAttribute("factor_1"));
+        let factor2 = parseInt(d.getAttribute("factor_2"));
+        let factor3 = parseInt(d.getAttribute("factor_3"));
+
+        let mix = spectral.mix(
+          [c1, factor1],
+          [c2, factor2],
+          [c3, factor3]
+        );
+
+        if (gamutmethod != 'none' && !mix.inGamut()) {
+          mix = mix.toGamut({ method: gamutmethod });
+        }
+
+        d.style.setProperty('background-color', mix.toString());
+        d.style.setProperty('color', mix.luminance < 0.25 ? '#ccc' : '#333');
+      });
+
+      updateCodeBlock("#mix_container_multi_code", `let color1 = new spectral.Color("${document.querySelector("#color1").value}");
+let color2 = new spectral.Color("${document.querySelector("#color2").value}");
+let color3 = new spectral.Color("${document.querySelector("#color3").value}");
+
+let mix = spectral.mix(
+     [color1, ...], [color2, ...], [color3, ...]
+);`);
+    }
+
+    let random = (id) => {
+      if (id == undefined) {
+        for (let i = 1; i <= 3; i++) {
+          let c = Math.floor(Math.random() * 16777215).toString(16);
+
+          document.querySelector("#color" + i).value = `#${(c.length == 5 ? '0' : '')}${c}`;
+          document.querySelector("#color" + i + "_tinting_strength").value = "1";
+        }
+      }
+      else {
+        let c = Math.floor(Math.random() * 16777215).toString(16);
+
+        document.querySelector("#color" + id).value = `#${(c.length == 5 ? '0' : '')}${c}`;
+        document.querySelector("#color" + id + "_tinting_strength").value = "1";
+      }
+
+      updateSelectedColor(new spectral.Color(document.querySelector("#color1").value));
+
+      updateBar();
+      updatePalette();
+      updateGradient();
+      updateMulti();
+    }
+  </script>
+</body>
+
+</html>
