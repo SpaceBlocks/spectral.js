@@ -13,13 +13,15 @@ It's designed specifically for developers and artists aiming to implement realis
 The goals behind Spectral.js:
 
 - 🎨 **Physically-based**: Pigment mixing is modeled using spectral data and light-matter interaction, not RGB math tricks.
-- ⚖️ **Perceptually aware**: Uses color spaces like **OKLab** and **OKLCH** for perceptual uniformity and smart gamut mapping.
+- ⚖️ **Perceptually aware**: Uses color spaces like **OKLab** and **OKLCh** for perceptual uniformity and smart gamut mapping.
 - 🧠 **Intelligent mixing**: Every mix uses **luminance**, **tinting strength**, and user-defined intent to calculate **effective concentration**.
 - 🚀 **Optimized for performance**: Lazy memoization and fast math make it lightweight and fast, even in browser environments.
 - 🛠️ **Simple API**: Designed for developers and artists alike — works with familiar hex, RGB, and CSS strings.
 - 📐 **Accurate under the hood**: All calculations use **64-bit floating point math** and are grounded in color science literature.
 
 Whether you’re building a color picker, a digital painting app, or just experimenting with creative coding, **Spectral.js** gives you a closer approximation to how real pigments behave.
+
+👉 You can try **Spectral.js** live at [onedayofcrypto.art](https://onedayofcrypto.art/)!
 
 ---
 
@@ -137,9 +139,9 @@ The **palette** function takes 2 colors and a size parameter, it returns an arra
 let color1 = new spectral.Color('#BB0657');
 let color2 = new spectral.Color('#E0E0B3');
 
-let palette = spectral.palette(color1, color2, 9);
+let palette = spectral.palette(color1, color2, 8);
 
-console.log(palette.map((x) => x.toString())); //['#BB0657', '#BE0A5B', '#C91969', '#D72D7F', '#E34895', '#EB69A7', '#ED91B1', '#E8C0B4', '#E0E0B3']
+console.log(palette.map((x) => x.toString())); //['#BB0657', '#C00C5C', '#CD1E6F', '#DD3889', '#E85AA0', '#ED85AF', '#E9B9B4', '#E0E0B3']
 ```
 
 ![image1](/images/image03.png)
@@ -194,12 +196,39 @@ console.log(mix.toString()); //#FF8427
 
 ---
 
+## 🧵 GLSL Integration
+
+The spectral.glsl file brings **Spectral.js** to **GLSL** for use in shaders.
+It enables real-time spectral color mixing directly on the GPU, perfect for generative art and WebGL projects.
+
+- Supports mixing between **2 to 4 colors**.
+- Includes optional **tinting strength** control per color.
+- 👉 A live demo is available on [ShaderToy](https://www.shadertoy.com/view/33XSWl).
+
+### 🔧 Basic Usage
+
+```glsl
+vec3 yellow = vec3(0.9734452903984108, 0.871367119198797000, 0.06124605423161808);
+vec3 red    = vec3(0.7835377915261926, 0.030713443732993822, 0.13286832155381810);
+vec3 blue   = vec3(0.0331047665708844, 0.177888415983629100, 0.70110189193297420);
+
+vec3 col = spectral_mix(
+	yellow, 1., 1. - p.x,
+	red, 0.5, p.x - p.y,
+	blue, 1., p.y
+);
+```
+
+![image1](/images/image07.png)
+
+---
+
 ## 🛠️ API Documentation
 
 ### 🔹 Color Class
 
-The **Color** class internally computes **spectral reflectance**, **XYZ**, **OKLab**, **OKLCH**, and **Kubelka-Munk** parameters.
-To optimize performance, the class uses **lazy memoization**: values such as **luminance**, **KS**, and transforms to color spaces like **OKLab** and **OKLCH** are computed only once when accessed, then cached for future use, ensuring high performance without redundant calculations.
+The **Color** class internally computes **spectral reflectance**, **XYZ**, **OKLab**, **OKLCh**, and **Kubelka-Munk** parameters.
+To optimize performance, the class uses **lazy memoization**: values such as **luminance**, **KS**, and transforms to color spaces like **OKLab** and **OKLCh** are computed only once when accessed, then cached for future use, ensuring high performance without redundant calculations.
 
 #### Methods and Properties:
 - `color.R` – Reflectance curve from 380 to 750 nm in 10 nm steps.
@@ -207,7 +236,7 @@ To optimize performance, the class uses **lazy memoization**: values such as **l
 - `color.lRGB` – linear RGB color space representation.
 - `color.XYZ` – CIE XYZ color space representation.
 - `color.OKLab` – OKLab color space representation.
-- `color.OKLCH` – OKLCH color representation.
+- `color.OKLCh` – OKLCh color representation.
 - `color.KS` – Kubelka-Munk absorption/scattering parameters.
 - `color.luminance` – Luminance (Y value from CIE XYZ).
 - `color.tintingStrength` – Intensity of the pigment mixture (default: `1`).
@@ -215,8 +244,8 @@ To optimize performance, the class uses **lazy memoization**: values such as **l
 - `color.toGamut({ method })` – Adjusts color to fit within the gamut (`clip` or `map`).
 - `color.toString({ format = "hex", method = "map" })` – Returns the color as a hex or RGB string. If the color is out of gamut, it is adjusted using the specified gamut mapping method ("map" or "clip"). "map" is used by default for perceptual accuracy.
 
-The properties **OKLab**, **OKLCH**, and the utility function **deltaEOK** are not only useful for perceptual color comparison — they are also used internally in gamut mapping.
-When a color is outside the displayable sRGB gamut, **Spectral.js** uses **OKLCH chroma reduction** combined with ΔE optimization in **OKLab** space to bring the color into gamut while preserving appearance as closely as possible.
+The properties **OKLab**, **OKLCh**, and the utility function **deltaEOK** are not only useful for perceptual color comparison — they are also used internally in gamut mapping.
+When a color is outside the displayable sRGB gamut, **Spectral.js** uses **OKLCh chroma reduction** combined with ΔE optimization in **OKLab** space to bring the color into gamut while preserving appearance as closely as possible.
 
 ---
 
@@ -243,5 +272,5 @@ MIT © **2025 Ronald van Wijnen**
 ### 🧠 Acknowledgments
 - **Spectral.js** is based on the **Kubelka-Munk theory**, developed by chemists **Richard S. Kubelka** and **Franz Munk** in the **1930s**.
 - Thanks to [Scott Allen Burns](http://scottburns.us/) for his research and publication of [Generating Reflectance Curves from sRGB Triplets](http://scottburns.us/reflectance-curves-from-srgb/). The spectral data **Spectral.js** uses is created with a variation of his [LHTSS](http://scottburns.us/reflectance-curves-from-srgb-10/) method.
-- **Spectral.js** uses color conversion matrices and structural inspiration from colorjs.io, aiming to maintain compatibility in function naming and color space representation.
-- Thanks also to [SCRT WPNS](https://scrtwpns.com/) for their awesome product [Mixbox](https://scrtwpns.com/mixbox/) which inspired me to research the Kubelka-Munk theory. If you're interested in physically accurate pigment mixing, check out [Mixbox](https://scrtwpns.com/mixbox/).
+- **Spectral.js** uses color conversion matrices and structural inspiration from [Color.js](https://colorjs.io/), aiming to maintain compatibility in function naming and color space representation.
+- Thanks also to [SCRT WPNS](https://scrtwpns.com/) for their awesome product [Mixbox](https://scrtwpns.com/mixbox/) which inspired me to research the Kubelka-Munk theory.
