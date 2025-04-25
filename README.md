@@ -249,6 +249,34 @@ When a color is outside the displayable sRGB gamut, **Spectral.js** uses **OKLCh
 
 ---
 
+## 🚨 Upgrading from 2.0.2
+
+Version **3.0** introduces **breaking changes** due to the addition of the **Color** class.
+
+- All functions like `mix`, `palette`, and `gradient` now expect **Color** objects, **not** raw arrays or hex strings.
+- Color values must be explicitly created using the `Color` constructor before being passed into mixing functions.
+
+### ⚡ Quick Migration Example
+
+**Before (2.0.2):**
+
+```js
+let mix = spectral.mix('#002185', '#FCD200', 0.5);
+```
+
+**Now (3.0):**
+
+```js
+let color1 = new spectral.Color('#002185');
+let color2 = new spectral.Color('#FCD200');
+
+let mix = spectral.mix([color1, 0.5], [color2, 0.5]);
+```
+
+👉 **Tip**: Always wrap your hex codes, RGB arrays, or CSS strings with `new spectral.Color()` before mixing!
+
+---
+
 ## 🤝 Contributing
 
 Contributions are warmly welcomed! Feel free to open an issue or submit a pull request on GitHub.
