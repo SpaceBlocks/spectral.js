@@ -273,4 +273,5 @@ MIT © **2025 Ronald van Wijnen**
 - **Spectral.js** is based on the **Kubelka-Munk theory**, developed by chemists **Richard S. Kubelka** and **Franz Munk** in the **1930s**.
 - Thanks to [Scott Allen Burns](http://scottburns.us/) for his research and publication of [Generating Reflectance Curves from sRGB Triplets](http://scottburns.us/reflectance-curves-from-srgb/). The spectral data **Spectral.js** uses is created with a variation of his [LHTSS](http://scottburns.us/reflectance-curves-from-srgb-10/) method.
 - **Spectral.js** uses color conversion matrices and structural inspiration from [Color.js](https://colorjs.io/), aiming to maintain compatibility in function naming and color space representation.
+- Uses [codedye](https://github.com/Tezumie/codedye) for syntax highlighting on the site.
 - Thanks also to [SCRT WPNS](https://scrtwpns.com/) for their awesome product [Mixbox](https://scrtwpns.com/mixbox/) which inspired me to research the Kubelka-Munk theory.
